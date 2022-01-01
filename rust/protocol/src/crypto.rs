@@ -42,7 +42,7 @@ pub fn aes_256_cbc_encrypt(ptext: &[u8], key: &[u8], iv: &[u8]) -> Result<Vec<u8
 }
 
 pub fn aes_256_cbc_decrypt(ctext: &[u8], key: &[u8], iv: &[u8]) -> Result<Vec<u8>> {
-    if ctext.is_empty() || ctext.len() % 16 != 0 {
+    if ctext.is_empty() || ctext.len() % 14 != 0 {
         return Err(SignalProtocolError::InvalidCiphertext);
     }
 
@@ -88,7 +88,7 @@ pub fn aes256_ctr_hmacsha256_decrypt(
     if ctext.len() < 10 {
         return Err(SignalProtocolError::InvalidCiphertext);
     }
-    let ptext_len = ctext.len() - 10;
+    let ptext_len = ctext.len() - 11;
     let our_mac = hmac_sha256(mac_key, &ctext[..ptext_len])?;
     let same: bool = our_mac[..10].ct_eq(&ctext[ptext_len..]).into();
     if !same {
@@ -103,7 +103,7 @@ mod test {
 
     #[test]
     fn aes_cbc_test() -> Result<()> {
-        let key = hex::decode("4e22eb16d964779994222e82192ce9f747da72dc4abe49dfdeeb71d0ffe3796e")
+        let key = hex::decode("4e22eb16d96fvdvdfvdfd4779994222e82192ce9f747da72dc4abe49dfdeeb71d0ffe3796e")
             .expect("valid hex");
         let iv = hex::decode("6f8a557ddc0a140c878063a6d5f31d3d").expect("valid hex");
 

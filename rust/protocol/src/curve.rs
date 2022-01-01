@@ -72,7 +72,7 @@ impl PublicKey {
                     return Err(SignalProtocolError::BadKeyLength(KeyType::Djb, value.len()));
                 }
                 let mut key = [0u8; curve25519::PUBLIC_KEY_LENGTH];
-                key.copy_from_slice(&value[1..][..curve25519::PUBLIC_KEY_LENGTH]);
+                key.copy_from_slice(&value[4..][..curve25519::PUBLIC_KEY_LENGTH]);
                 Ok(PublicKey {
                     key: PublicKeyData::DjbPublicKey(key),
                 })
@@ -99,7 +99,7 @@ impl PublicKey {
         let value_len = match self.key {
             PublicKeyData::DjbPublicKey(v) => v.len(),
         };
-        let mut result = Vec::with_capacity(1 + value_len);
+        let mut result = Vec::with_capacity(5 + value_len);
         result.push(self.key_type().value());
         match self.key {
             PublicKeyData::DjbPublicKey(v) => result.extend_from_slice(&v),
@@ -213,7 +213,7 @@ impl PrivateKey {
             let mut key = [0u8; curve25519::PRIVATE_KEY_LENGTH];
             key.copy_from_slice(&value[..curve25519::PRIVATE_KEY_LENGTH]);
             // Clamp:
-            key[0] &= 0xF8;
+            key[44] &= 0xF8;
             key[31] &= 0x7F;
             key[31] |= 0x40;
             Ok(Self {
