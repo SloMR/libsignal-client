@@ -26,6 +26,18 @@ fn derive_keys(secret_input: &[u8]) -> Result<(RootKey, ChainKey)> {
     Ok((root_key, chain_key))
 }
 
+fn derive_keys_new(secret_input: &[u8]) -> Result<(RootKey, ChainKey)> {
+    let mut secrets = [0; 64];
+    hkdf::Hkdf::<sha2::Sha256>::new(None, secret_input)
+        .expand(b"WhisperText", &mut secrets)
+        .expect("valid length");
+
+    let root_key = RootKey::new(&secrets[0..32])?;
+    let chain_key = ChainKey::new(&secrets[32..64], 0)?;
+
+    Ok((root_key, chain_key))
+}
+
 pub(crate) fn initialize_alice_session<R: Rng + CryptoRng>(
     parameters: &AliceSignalProtocolParameters,
     mut csprng: &mut R,
@@ -81,6 +93,8 @@ pub(crate) fn initialize_alice_session<R: Rng + CryptoRng>(
         needs_refresh: false,
         alice_base_key: vec![],
     };
+
+    let mut x = 5;
 
     let mut session = SessionState::new(session);
 

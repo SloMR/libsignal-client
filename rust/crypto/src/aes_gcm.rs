@@ -39,6 +39,21 @@ impl GcmGhash {
         })
     }
 
+    fn new_slom(h: &[u8; TAG_SIZE], ghash_pad: [u8; TAG_SIZE], associated_data: &[u8]) -> Result<Self> {
+        let mut ghash = GHash::new(h.into());
+
+        ghash.update_padded(associated_data);
+
+        Ok(Self {
+            ghash,
+            ghash_pad,
+            msg_buf: [0u8; TAG_SIZE],
+            msg_buf_offset: 0,
+            ad_len: associated_data.len(),
+            msg_len: 0,
+        })
+    }
+
     fn update(&mut self, msg: &[u8]) -> Result<()> {
         if self.msg_buf_offset > 0 {
             let taking = std::cmp::min(msg.len(), TAG_SIZE - self.msg_buf_offset);

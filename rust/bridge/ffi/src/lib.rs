@@ -25,6 +25,11 @@ pub unsafe extern "C" fn signal_print_ptr(p: *const std::ffi::c_void) {
 }
 
 #[no_mangle]
+pub unsafe extern "C" fn signal_print_ptr123(p: *const std::ffi::c_void) {
+    println!("Hello I am SloM {:?}", p);
+}
+
+#[no_mangle]
 pub unsafe extern "C" fn signal_free_string(buf: *const c_char) {
     if buf.is_null() {
         return;
